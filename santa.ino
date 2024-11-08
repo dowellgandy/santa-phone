@@ -3,7 +3,7 @@
 #include <SD.h>
 
 const int buttonPin = 7;
-const char filename[]= "santa001.wav";
+const char filename[] = "SANTA002.WAV";
 
 int buttonState = 0;
 
@@ -24,7 +24,7 @@ void setup() {
   }
   Serial.println("initialization done.");
 
-  delay(100);
+  delay(1000);
 
   File root = SD.open("/");
   if (root) {
@@ -42,22 +42,22 @@ void setup() {
     Serial.println("Error: Could not open root directory.");
   }
 
-  File testFile = SD.open("santa001.wav");
-  if (testFile) {
-    Serial.println("Successfully opened santa001.wav");
-    // Read the first few bytes for verification
-    while (testFile.available()) {
-      Serial.write(testFile.read()); // Output the raw file data to Serial Monitor
-    }
-    testFile.close();
-  } else {
-    Serial.println("Error: Could not open santa001.wav directly.");
+  if (SD.exists(filename)) {
+  Serial.println("File exists on SD card.");
+    } else {
+  Serial.println("File does NOT exist on SD card.");
   }
 
   santaWave = SDWaveFile(filename);
 
+  Serial.println(santaWave.bitsPerSample());
+
+  long channels = santaWave.channels();
+  Serial.print("Channels = ");
+  Serial.println(channels);
+
   if(!santaWave) {
-    Serial.println("Error opening santa001.wav");
+    Serial.println("Error assigning file to SDWaveFile object");
     while (true);
   }
 
