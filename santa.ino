@@ -4,16 +4,20 @@
 
 const int buttonPin = 7;
 const char filename[] = "SANTA002.WAV";
+bool isPlaying = false;
 
-int buttonState = 0;
+int buttonState = LOW;
+int lastButtonState = LOW;
 
 SDWaveFile santaWave;
 
 void setup() {
   Serial.begin(9600);
-  while(!Serial) {
-    ;
-  }
+  // #ifdef Serial
+  //   while (!Serial) {
+  //     ; // Wait only if Serial is available (USB connected)
+  //   }
+  // #endif
 
   pinMode(buttonPin, INPUT);
 
@@ -23,8 +27,6 @@ void setup() {
     return;
   }
   Serial.println("initialization done.");
-
-  delay(1000);
 
   File root = SD.open("/");
   if (root) {
@@ -61,15 +63,27 @@ void setup() {
     while (true);
   }
 
+  AudioOutI2S.volume(1.2);
+
 }
 
 void loop() {
   buttonState = digitalRead(buttonPin);
 
-  if (buttonState == HIGH) {
-    Serial.println("Playing santa001.wav");
-    AudioOutI2S.play(santaWave);
+  // Check if button state has changed
+  if (buttonState != lastButtonState) {
+    if (buttonState == LOW && !isPlaying) {  // Button pressed (transition from LOW to HIGH)
+      delay(1200);
+      Serial.println("Playing santa001.wav");
+      AudioOutI2S.play(santaWave);
+      isPlaying = true;
+    } else if (buttonState == HIGH && isPlaying) {  // Button released (transition from HIGH to LOW)
+      Serial.println("Stopping playback");
+      AudioOutI2S.stop();
+      isPlaying = false;
+    }
   }
 
-
+  // Save the current button state for the next loop iteration
+  lastButtonState = buttonState;
 }
