@@ -63,7 +63,12 @@ void setup() {
     while (true);
   }
 
-  AudioOutI2S.volume(1.2);
+  AudioOutI2S.volume(1.0);
+
+  // Preload with a quick playback to initialize
+  AudioOutI2S.play(santaWave);
+  delay(50);  // Play for a brief period
+  AudioOutI2S.stop();
 
 }
 
